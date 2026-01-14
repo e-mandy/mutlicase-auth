@@ -1,6 +1,7 @@
 import type { createUserDto } from "../../domain/dtos/createUserDto.js";
 import type { UserEntity } from "../../domain/entities/user.js";
 import type { IUserRepositories } from "../../domain/repositories/UserRepositories.js";
+import bcrypt from 'bcrypt';
 
 export class RegisterUser{
     private userRepository: IUserRepositories;
@@ -14,6 +15,15 @@ export class RegisterUser{
             throw new Error("USER_ALREADY_EXISTS");
         }
 
-        return await this.userRepository.create(data);
+        let hashedPassword: string | null = null;
+        if(data.password){
+            const salt = await bcrypt.genSalt(10);
+            hashedPassword = await bcrypt.hash(data.password, salt);
+        }
+
+        return await this.userRepository.create({
+            email: data.email,
+            password: hashedPassword
+        });
     }
 }
