@@ -1,21 +1,22 @@
-import type { NextFunction } from "express";
+import type { NextFunction, Response, Request } from "express";
 import type { ITokenService } from "../../../domain/security/ITokenService.js";
 import { JwtTokenService } from "../../security/JwtTokenService.js";
-import type { Response, Request } from 'express';
 
 export const authMiddleware = (tokenService: ITokenService) => {
     return (req: Request, res: Response, next: NextFunction) => {
 
         const authorization = req.headers.authorization;
         
-        if(!authorization) return res.status(401).json({
+        if(!authorization || !authorization.startsWith('Bearer ')) return res.status(401).json({
             message: "UNAUTHORIZED ACCESS"
         });
+
         const token = authorization.split(' ')[1];
 
         if(!token) return res.status(400).json({
             message: "UNAUTHORIZED ACCESS"
         });
+        
         try{
             const decoded = tokenService.verifyAccessToken(token);
             if(!decoded) return res.status(401).json({

@@ -18,7 +18,7 @@ const auth = new AuthController(loginUseCase, registerUseCase);
 
 router.post('/register', auth.register);
 router.post('/login', auth.login);
-router.get('/me', authMiddleware, (req: Request, res: Response) => {
+router.get('/me', authMiddleware(tokenService), (req: Request, res: Response) => {
     res.status(200).json(req.user);
 });
 

@@ -20,6 +20,7 @@
   "homepage": "https://github.com/e-mandy/mutlicase-auth#readme",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.8",
     "prisma": "^7.2.0",
