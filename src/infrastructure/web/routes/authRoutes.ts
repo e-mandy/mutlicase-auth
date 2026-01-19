@@ -1,10 +1,10 @@
 import express from 'express';
-import { AuthController } from '../controllers/AuthController.js';
-import { LoginUser } from '../../../application/use-cases/LoginUser.js';
-import { RegisterUser } from '../../../application/use-cases/RegisterUser.js';
-import { PrismaUserRepository } from '../../repositories/PrismaUserRepository.js';
-import { JwtTokenService } from '../../security/JwtTokenService.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
+import { AuthController } from '../controllers/AuthController.ts';
+import { LoginUser } from '../../../application/use-cases/LoginUser.ts';
+import { RegisterUser } from '../../../application/use-cases/RegisterUser.ts';
+import { PrismaUserRepository } from '../../repositories/PrismaUserRepository.ts';
+import { JwtTokenService } from '../../security/JwtTokenService.ts';
+import { authMiddleware } from '../middleware/authMiddleware.ts';
 import type { Response, Request } from 'express';
 
 const router = express.Router();

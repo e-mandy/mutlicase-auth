@@ -14,15 +14,20 @@ export class RegisterUser{
     }
     
     async execute(data: createUserDto): Promise<{ user: UserEntity, access_token: string, refresh_token: string }>{
-        if(await this.userRepository.findByEmail(data.email) !== null){
+        const existUser = await this.userRepository.findByEmail(data.email);
+
+        console.log("je passe ?")
+        if(!existUser){
             throw new Error("USER_ALREADY_EXISTS");
         }
-
         let hashedPassword: string | null = null;
         if(data.password){
             const salt = await bcrypt.genSalt(10);
             hashedPassword = await bcrypt.hash(data.password, salt);
+        }else{
+            throw new Error('BAD CREDENTIALS');
         }
+
         const newUser = await this.userRepository.create({
             email: data.email,
             password: hashedPassword

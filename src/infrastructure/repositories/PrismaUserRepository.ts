@@ -1,7 +1,7 @@
-import type { createUserDto } from "../../domain/dtos/createUserDto.js";
-import type { UserEntity } from "../../domain/entities/user.js";
-import type { IUserRepositories } from "../../domain/repositories/UserRepositories.js";
-import { prisma } from "../database/prisma.js";
+import type { createUserDto } from "../../domain/dtos/createUserDto.ts";
+import type { UserEntity } from "../../domain/entities/user.ts";
+import type { IUserRepositories } from "../../domain/repositories/UserRepositories.ts";
+import { prisma } from "../database/prisma.ts";
 import jwt from 'jsonwebtoken';
 
 export class PrismaUserRepository implements IUserRepositories{

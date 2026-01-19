@@ -1,6 +1,6 @@
-import type { LoginUser } from "../../../application/use-cases/LoginUser.js";
-import type { RegisterUser } from "../../../application/use-cases/RegisterUser.js";
-import type { createUserDto } from "../../../domain/dtos/createUserDto.js";
+import type { LoginUser } from "../../../application/use-cases/LoginUser.ts";
+import type { RegisterUser } from "../../../application/use-cases/RegisterUser.ts";
+import type { createUserDto } from "../../../domain/dtos/createUserDto.ts";
 import type { Response, Request } from 'express';
 
 export class AuthController {
@@ -16,9 +16,14 @@ export class AuthController {
         try{
             let credentials = req.body as createUserDto;
             const result = await this.registerUseCase.execute(credentials);
+            console.log(result);
             return res.status(401).json(result);
 
         }catch(error: any){
+            if(error.name == "BAD CREDENTIALS") return res.status(400).json({
+                message: "Invalid credentials"
+            })
+
             if(error.name == 'USER_ALREADY_EXISTS') return res.status(409).json({
                 message: error.message
             });
@@ -28,7 +33,7 @@ export class AuthController {
             });
         }
     };
-    
+
 
     login = async (req: Request, res: Response) => {
         const { email, password } = req.body;

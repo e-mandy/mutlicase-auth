@@ -1,6 +1,5 @@
 import type { NextFunction, Response, Request } from "express";
-import type { ITokenService } from "../../../domain/security/ITokenService.js";
-import { JwtTokenService } from "../../security/JwtTokenService.js";
+import type { ITokenService } from "../../../domain/security/ITokenService.ts";
 
 export const authMiddleware = (tokenService: ITokenService) => {
     return (req: Request, res: Response, next: NextFunction) => {
