@@ -1,6 +1,7 @@
 import type { LoginUser } from "../../../application/use-cases/LoginUser.js";
 import type { RegisterUser } from "../../../application/use-cases/RegisterUser.js";
 import type { createUserDto } from "../../../domain/dtos/createUserDto.js";
+import type { Response, Request } from 'express';
 
 export class AuthController {
     private loginUseCase: LoginUser;
