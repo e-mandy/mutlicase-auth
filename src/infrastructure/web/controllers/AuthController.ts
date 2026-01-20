@@ -16,7 +16,6 @@ export class AuthController {
         try{
             let credentials = req.body as createUserDto;
             const result = await this.registerUseCase.execute(credentials);
-            console.log(result);
             return res.status(200).json(result);
 
         }catch(error: any){
@@ -43,6 +42,11 @@ export class AuthController {
             res.cookie('refreshToken', user.refresh_token, {
                 httpOnly: true,
                 sameSite: 'strict'
+            });
+
+            return res.status(200).json({
+                accessToken: user.access_token,
+                user: user.user
             });
         }catch(error: any){
             if(error.name == 'INVALID CREDENTIALS') return res.status(401).json({
