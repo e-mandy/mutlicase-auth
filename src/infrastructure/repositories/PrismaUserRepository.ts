@@ -53,4 +53,36 @@ export class PrismaUserRepository implements IUserRepositories{
             }
         });
     }
+
+    async findVerificationToken(token: string){
+        const result = await prisma.verificationToken.findUnique({
+            where: {
+                token: token
+            },
+            select: {
+                token: true
+            }
+        });
+
+        return result ? result.token : null;
+    }
+
+    async activateUser(id: string){
+        await prisma.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                emailVerifiedAt: new Date()
+            }
+        });
+    }
+
+    async deleteVerificationToken(token: string){
+        await prisma.verificationToken.delete({
+            where: {
+                token: token
+            }
+        });
+    }
 }

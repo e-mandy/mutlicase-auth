@@ -11,7 +11,12 @@ export class NodeMailerService implements IMailerService{
             from: process.env.MAILER_ADDRESS,
             to: email,
             subject: "Vérification d'email",
-            html: "<p>Yo bro</p>"
+            html: `
+                <div>
+                    <h1>Multi Auth Test</h1>
+                    <p>Cliquez sur le lien pour finaliser la validation de votre compte.</p>
+                    <a href="http://localhost:3000/api/auth/verify-email?token=${token}">Lien de vérification</a>
+                </div>`
         });
     }
 }
