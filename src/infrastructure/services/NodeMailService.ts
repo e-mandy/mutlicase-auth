@@ -3,7 +3,17 @@ import transporter from '../mailer/nodemailer.ts';
 
 export class NodeMailerService implements IMailerService{
     async sendPasswordResetToken(email: string, token: string){
-        return;
+        await transporter.sendMail({
+            from: process.env.MAILER_ADDRESS,
+            to: email,
+            subject: "Réinitialisation de mot de passe",
+            html: `
+                <div>
+                    <h1>Réinitialisation de mot de passe</h1>
+                    <p>Cliquez sur ce lien pour réinitiliser votre mot de passe : <a href="http://localhost:3000/api/reset-password?=token=${token}">Réinitialiser son mot de passe.</a></p>
+                </div> 
+            `
+        })
     }
 
     async sendVerificationEmail(email: string, token: string){
@@ -19,4 +29,5 @@ export class NodeMailerService implements IMailerService{
                 </div>`
         });
     }
+
 }
