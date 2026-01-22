@@ -2,7 +2,7 @@ import { AppError } from "../../domain/exceptions/AppError.ts";
 import type { IUserRepositories } from "../../domain/repositories/UserRepositories.ts";
 import bcrypt from 'bcrypt';
 
-export class ResetToken{
+export class ResetPassword{
     userRepository: IUserRepositories;
 
     constructor(repository: IUserRepositories){

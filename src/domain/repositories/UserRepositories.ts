@@ -1,4 +1,4 @@
-import type { VerificationToken } from "@prisma/client";
+import type { PasswordResetToken, VerificationToken } from "@prisma/client";
 import type { createUserDto } from "../dtos/createUserDto.js";
 import type { UserEntity } from "../entities/user.js";
 
@@ -12,6 +12,7 @@ export interface IUserRepositories {
     findVerificationToken: (token: string) => Promise<VerificationToken| null>
     activateUser: (id: string) => Promise<void>
     deleteVerificationToken: (token: string) => Promise<void>
+    findTokenResetPassword: (token: string) => Promise<PasswordResetToken | null>
     updatePassword: (id: string, hashedPassword: string) => Promise<void>
     removePasswordResetToken: (userId: string) => Promise<void>
 }

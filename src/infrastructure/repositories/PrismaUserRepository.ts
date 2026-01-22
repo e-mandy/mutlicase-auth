@@ -83,6 +83,14 @@ export class PrismaUserRepository implements IUserRepositories{
         });
     }
 
+    async findTokenResetPassword(token: string){
+        return await prisma.passwordResetToken.findUnique({
+            where: {
+                token: token
+            }
+        });
+    }
+
     async updatePassword(email: string, hashedPassword: string){
         await prisma.user.update({
             where: {
