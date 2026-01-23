@@ -28,11 +28,15 @@ export class AuthController {
         }
     };
 
-
     login = async (req: Request, res: Response) => {
         const { email, password } = req.body;
+        const ip = req.ip;
+        const userAgent = req.headers['user-agent'];
+
+        if(!ip || !userAgent) throw new AppError('DEVICE NOT IDENTIFIED', 401);
+
         try{
-            const user = await this.loginUseCase.execute(email, password);
+            const user = await this.loginUseCase.execute(email, password, { ip, userAgent });
 
             res.cookie('refreshToken', user.refresh_token, {
                 httpOnly: true,

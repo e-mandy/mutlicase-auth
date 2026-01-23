@@ -18,7 +18,7 @@ export class LoginUser {
             await this.userRepository.saveLoginAttempt({
                 email: email,
                 ...info, 
-                status: 'FAILED' 
+                status: 'FAILED'
             });
             throw new Error("INVALID CREDENTIALS");
         }
