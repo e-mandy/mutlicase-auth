@@ -129,4 +129,28 @@ export class PrismaUserRepository implements IUserRepositories{
     async activateUser2FA(userId: string){
         return ;
     }
+
+    async findSecretByUserId(userId: string){
+        return "";
+    }
+
+    async saveLoginAttempt(datas: { userId?: string; email: string; ip: string; userAgent: string; status: "SUCCESS" | "FAILED"; }){
+        await prisma.loginHistory.create({
+            data: {
+                ip: datas.ip,
+                userAgent: datas.userAgent,
+                success: !(datas.status === 'FAILED'),
+                userId: datas?.userId ?? null
+            }
+        });
+    }
+
+    async cleanupExpiredTokens(){
+        const now = new Date();
+        await prisma.blacklistedAccessToken.deleteMany({
+            where: {
+                expiresAt: { lt: now }
+            }
+        });
+    }
 }

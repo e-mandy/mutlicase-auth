@@ -1,5 +1,10 @@
-import type { NextFunction, Request, Response } from "express";
+import { rateLimit } from 'express-rate-limit';
 
-const rateLimiterMiddleware = (req: Request, res: Response, next: NextFunction) => {
-
-}
+export const rateLimiterMiddleware = rateLimit({
+    windowMs: 1000 * 60 * 15,
+    limit: 5,
+    ipv6Subnet: 56,
+    message: { message: "Stop force bro !!" },
+    standardHeaders: true,
+    legacyHeaders: false
+});

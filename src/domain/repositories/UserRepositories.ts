@@ -21,4 +21,12 @@ export interface IUserRepositories {
     save2FASecret: (secret: string) => Promise<void>
     findSecretByUserId: (userId: string) => Promise<String | null>
     activateUser2FA: (userId: string) => Promise<void>
+    saveLoginAttempt: (datas: {
+        userId?: string,
+        email: string,
+        ip: string,
+        userAgent: string,
+        status: "SUCCESS" | "FAILED"
+    }) => Promise<void>
+    cleanupExpiredTokens: () => Promise<void>
 }
