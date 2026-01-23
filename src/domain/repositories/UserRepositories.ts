@@ -1,4 +1,4 @@
-import type { PasswordResetToken, VerificationToken } from "@prisma/client";
+import type { OAuthAccount, PasswordResetToken, VerificationToken } from "@prisma/client";
 import type { createUserDto } from "../dtos/createUserDto.js";
 import type { UserEntity } from "../entities/user.js";
 
@@ -15,6 +15,8 @@ export interface IUserRepositories {
     findTokenResetPassword: (token: string) => Promise<PasswordResetToken | null>
     updatePassword: (id: string, hashedPassword: string) => Promise<void>
     removePasswordResetToken: (userId: string) => Promise<void>
-    findUserByOAuth: (provider: string, providerId: string) => Promise<UserEntity | null>
+    findUserByOAuth: (provider: string, providerId: string) => Promise<OAuthAccount | null>
     linkOAuthAccount: (userId: string, data: any) => Promise<void>
+    verify2FAActivate: (email: string) => Promise<boolean>
+    save2FASecret: (secret: string) => Promise<void>
 }
