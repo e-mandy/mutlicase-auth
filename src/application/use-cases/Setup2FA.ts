@@ -12,7 +12,11 @@ export class Setup2FA{
         const is2FAActive = await this.userRepository.verify2FAActivate(email);
         if(is2FAActive) return ;
 
-        const newSecret = speakeasy.generateSecret({ name: email });
+        const newSecret = speakeasy.generateSecret({
+            length: 20,
+            name: `MonApp:${email}`,
+            issuer: "MonApp" 
+        });
         await this.userRepository.save2FASecret(newSecret.base32);
 
         return newSecret.otpauth_url;

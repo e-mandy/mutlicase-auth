@@ -125,4 +125,8 @@ export class PrismaUserRepository implements IUserRepositories{
     async save2FASecret(secret: string){
         return ;
     }
+
+    async activateUser2FA(userId: string){
+        return ;
+    }
 }
