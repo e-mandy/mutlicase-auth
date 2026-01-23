@@ -36,6 +36,8 @@ export class RegisterUser{
             password: hashedPassword
         });
 
+        
+
         this.mailService.sendVerificationEmail(newUser.email, "");
 
         const access_token = this.tokenService.generateAccessToken({ userId: newUser.id });

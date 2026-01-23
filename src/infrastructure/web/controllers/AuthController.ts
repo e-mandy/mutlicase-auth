@@ -4,14 +4,17 @@ import type { createUserDto } from "../../../domain/dtos/createUserDto.ts";
 import type { Response, Request, NextFunction } from 'express';
 import { AppError } from "../../../domain/exceptions/AppError.ts";
 import { registerSchema } from "../validators/authValidator.ts";
+import type { EmailVerify } from "../../../application/use-cases/EmailVerify.ts";
 
 export class AuthController {
     private loginUseCase: LoginUser;
     private registerUseCase: RegisterUser;
+    private emailVerifyUseCase: EmailVerify;
 
-    constructor(loginUseCase: LoginUser, registerUseCase: RegisterUser, ){
+    constructor(loginUseCase: LoginUser, registerUseCase: RegisterUser, emailVerifyUseCase: EmailVerify){
         this.loginUseCase = loginUseCase;
         this.registerUseCase = registerUseCase;
+        this.emailVerifyUseCase = emailVerifyUseCase;
     }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +43,7 @@ export class AuthController {
 
             res.cookie('refreshToken', user.refresh_token, {
                 httpOnly: true,
-                sameSite: 'strict'
+                sameSite: 'lax'
             });
 
             return res.status(200).json({
@@ -54,7 +57,15 @@ export class AuthController {
         }
     };
 
-    emailVerify = async (req: Request, res: Response) => {
-        //
+    emailVerify = async (req: Request, res: Response, next: NextFunction) => {
+        const token = req.params.token as string;
+
+        if(!token) throw new AppError('INVALID TOKEN', 400);
+        
+        try{
+            this.emailVerifyUseCase.execute(token);
+        }catch(error){
+            next(error);
+        }
     }
 }

@@ -17,7 +17,7 @@ const nodeMailer = new NodeMailerService();
 const loginUseCase = new LoginUser(userRepository, tokenService);
 const registerUseCase = new RegisterUser(userRepository, tokenService, nodeMailer);
 const emailVerifyUseCase = new EmailVerify(userRepository);
-const auth = new AuthController(loginUseCase, registerUseCase);
+const auth = new AuthController(loginUseCase, registerUseCase, emailVerifyUseCase);
 
 
 router.post('/register', auth.register);

@@ -54,6 +54,18 @@ export class PrismaUserRepository implements IUserRepositories{
         });
     }
 
+    async saveVerificationToken(token: string, userId: string){
+        const tokenExpiration = jwt.decode(token) as { exp: number };
+        await prisma.verificationToken.create({
+            data: {
+                token: token,
+                createdAt: new Date(),
+                userId: userId,
+                expiresAt: new Date(tokenExpiration.exp * 1000)
+            }
+        });
+    }
+
     async findVerificationToken(token: string){
         const result = await prisma.verificationToken.findUnique({
             where: {
