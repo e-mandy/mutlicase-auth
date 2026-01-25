@@ -73,6 +73,8 @@ export class AuthController {
         if(!refresh_token || !access_token) throw new AppError('INVALID TOKEN', 401);
         try{
             const result = this.logoutUseCase.execute(refresh_token, access_token);
+            if(!result) throw new AppError("LOGOUT FAILED", 500);
+            
             return res.json({
                 code: 200,
                 message: "User logged out successfully"

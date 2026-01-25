@@ -6,6 +6,19 @@ import jwt from 'jsonwebtoken';
 
 export class PrismaUserRepository implements IUserRepositories{
 
+    async checkTwoFactorActive(userId: string){
+        const result = await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            select: {
+                twoFactorEnabledAt: true
+            }
+        });
+
+        return (!result) ? null : result.twoFactorEnabledAt;
+    }
+
     async findByEmail(email: string): Promise<UserEntity | null>{
         const user = await prisma.user.findUnique({
             where: { email: email }
