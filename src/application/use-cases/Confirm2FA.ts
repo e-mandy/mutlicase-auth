@@ -17,5 +17,7 @@ export class Confirm2FA{
         if(!result) throw new AppError('2FA CODE INVALID', 400);
 
         await this.userRepository.activateUser2FA(userId);
+
+        return true;
     }
 }
