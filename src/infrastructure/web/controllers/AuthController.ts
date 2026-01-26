@@ -48,16 +48,20 @@ export class AuthController {
         if(!ip || !userAgent) throw new AppError('DEVICE NOT IDENTIFIED', 401);
 
         try{
-            const user = await this.loginUseCase.execute(email, password, { ip, userAgent });
+            const result = await this.loginUseCase.execute(email, password, { ip, userAgent });
 
-            res.cookie('refreshToken', user.refresh_token, {
+            if(result.twoFactorActive){
+                return res.status(200).json(result);
+            }
+
+            res.cookie('refreshToken', result.refresh_token, {
                 httpOnly: true,
                 sameSite: 'lax'
             });
 
             return res.status(200).json({
-                accessToken: user.access_token,
-                user: user.user
+                accessToken: result.access_token,
+                user: result.user
             });
         }catch(error: any){
             if(error.name == 'INVALID CREDENTIALS') return res.status(401).json({
@@ -101,5 +105,9 @@ export class AuthController {
         }catch(error){
             next(error);
         }
+    }
+
+    verifyOTP = async (req: Request, res: Response, next: NextFunction) => {
+        
     }
 }

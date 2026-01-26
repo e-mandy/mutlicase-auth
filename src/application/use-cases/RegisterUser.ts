@@ -8,13 +8,15 @@ import type { IMailerService } from "../../domain/services/IMailerService.ts";
 export class RegisterUser{
     private userRepository: IUserRepositories;
     private mailService: IMailerService;
+    tokenService: ITokenService;
 
-    constructor(repository: IUserRepositories, mailService: IMailerService){
+    constructor(repository: IUserRepositories, mailService: IMailerService, tokenService: ITokenService){
         this.userRepository = repository;
         this.mailService = mailService;
+        this.tokenService = tokenService;
     }
     
-    async execute(data: createUserDto): Promise<{ user: UserEntity }>{
+    async execute(data: createUserDto){
         const existUser = await this.userRepository.findByEmail(data.email);
 
         if(existUser){
@@ -34,11 +36,11 @@ export class RegisterUser{
             password: hashedPassword
         });
 
-        
-        this.mailService.sendVerificationEmail(newUser.email, "");
+        const token = this.tokenService.generateEmailToken({ email: data.email });
+        this.mailService.sendVerificationEmail(newUser.email, token);
 
         return {
-            user: newUser,
-        }
+            message: "User created successfully",
+        };
     }
 }

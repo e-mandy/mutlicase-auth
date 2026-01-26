@@ -8,15 +8,18 @@ export class JwtTokenService implements ITokenService{
     private access_secret: string;
     private refresh_secret: string;
     private secretResetPassword: string;
+    private secretMailKey: string;
 
     constructor(){
         if(!process.env.ACCESS_KEY_SECRET) throw new Error("SECRET KEY MISSED: ACCESS_KEY");
         if(!process.env.REFRESH_KEY_SECRET) throw new Error("SECRET KEY MISSED: REFRESH_KEY");
         if(!process.env.SECRET_PASSWORD_RESET_APP) throw new Error("SECRET KEY MISSED: RESET PASSWORD KEY");
+        if(!process.env.SECRET_MAIL_APP) throw new Error("SECRET MAIL KEY MISSED: SECRET_MAIL_APP");
 
         this.access_secret = process.env.ACCESS_KEY_SECRET;
         this.refresh_secret = process.env.REFRESH_KEY_SECRET;
         this.secretResetPassword = process.env.SECRET_PASSWORD_RESET_APP;
+        this.secretMailKey = process.env.SECRET_MAIL_APP;
     }
 
     generateAccessToken(payload: { userId: string }){
@@ -29,19 +32,15 @@ export class JwtTokenService implements ITokenService{
     }
 
     generateRefreshToken(payload: { userId: string }){
-        const refresh_key = process.env.REFRESH_KEY_SECRET;
-        let token = "";
-        if(refresh_key){
-            token = jwt.sign(payload, refresh_key, { expiresIn: "7d" });
-        }else{
-            throw new Error("Server Error");
-        }
-        
-        return token;
+        return jwt.sign(payload, this.refresh_secret, { expiresIn: "7d" });
     }
 
     generateRequestResetToken(payload: { userId: string}){
         return jwt.sign(payload, this.secretResetPassword, { expiresIn: "30m" });
+    }
+
+    generateEmailToken(payload: { email: string; }){
+        return jwt.sign(payload, this.secretMailKey, { expiresIn: "30m" });
     }
 
     verifyAccessToken(token: string){

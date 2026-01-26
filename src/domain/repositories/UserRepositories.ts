@@ -4,7 +4,6 @@ import type { UserEntity } from "../entities/user.js";
 
 
 export interface IUserRepositories {
-    checkTwoFactorActive: (userId: string) => Promise<Date | null>
     findByEmail: (email: string) => Promise<UserEntity | null>,
     create: (user: createUserDto) => Promise<UserEntity>,
     saveRefreshToken: (userId: string, token: string, expiresAt: Date) => Promise<void>
