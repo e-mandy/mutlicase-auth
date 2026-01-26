@@ -1,9 +1,10 @@
-import type { OAuthAccount, PasswordResetToken, VerificationToken } from "@prisma/client";
+import type { OAuthAccount, PasswordResetToken, User, VerificationToken } from "@prisma/client";
 import type { createUserDto } from "../dtos/createUserDto.js";
 import type { UserEntity } from "../entities/user.js";
 
 
 export interface IUserRepositories {
+    findById: (userId: string) => Promise<Omit<UserEntity, 'password'> | null>
     findByEmail: (email: string) => Promise<UserEntity | null>,
     create: (user: createUserDto) => Promise<UserEntity>,
     saveRefreshToken: (userId: string, token: string, expiresAt: Date) => Promise<void>

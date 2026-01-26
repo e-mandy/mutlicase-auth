@@ -6,24 +6,28 @@ import { AppError } from "../../../domain/exceptions/AppError.ts";
 import { registerSchema } from "../validators/authValidator.ts";
 import type { EmailVerify } from "../../../application/use-cases/EmailVerify.ts";
 import type { LogoutUser } from "../../../application/use-cases/LogoutUser.ts";
+import type { CodeOTPVerify } from "../../../application/use-cases/CodeOTPVerify.ts";
 
 export class AuthController {
     private loginUseCase: LoginUser;
     private registerUseCase: RegisterUser;
     private emailVerifyUseCase: EmailVerify;
     private logoutUseCase: LogoutUser;
+    private codeOTPVerifyUseCase: CodeOTPVerify;
 
     constructor(
         loginUseCase: LoginUser, 
         registerUseCase: RegisterUser, 
         emailVerifyUseCase: EmailVerify,
-        logoutUseCase: LogoutUser
+        logoutUseCase: LogoutUser,
+        codeOTPVerifyUseCase: CodeOTPVerify
     )
     {
         this.loginUseCase = loginUseCase;
         this.registerUseCase = registerUseCase;
         this.emailVerifyUseCase = emailVerifyUseCase;
-        this.logoutUseCase = logoutUseCase
+        this.logoutUseCase = logoutUseCase;
+        this.codeOTPVerifyUseCase = codeOTPVerifyUseCase;
     }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
@@ -108,6 +112,17 @@ export class AuthController {
     }
 
     verifyOTP = async (req: Request, res: Response, next: NextFunction) => {
-        
+        const { token } = req.body;
+        const userId = req.user?.userId as string;
+
+        try{
+            const result = await this.codeOTPVerifyUseCase.execute(token, userId);
+            if(!result) throw new AppError('OTP VERIFICATION FAILED', 500);
+
+            return res.status(200).json(result);
+        }catch(error){
+            next(error);
+        }
+
     }
 }

@@ -22,7 +22,7 @@ export const authMiddleware = (tokenService: ITokenService) => {
                 message: 'Unauthorized access'
             });
 
-            req.user = decoded;
+            req.user = decoded as { userId: string };
             next();
             
         }catch(error: any){
