@@ -1,6 +1,5 @@
 import { AppError } from "../../domain/exceptions/AppError.ts";
 import axios from 'axios';
-import type { GithubResponse } from "../../domain/services/socials.ts";
 
 export class GithubExchange {
     private github_id;

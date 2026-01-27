@@ -8,6 +8,8 @@ import type { EmailVerify } from "../../../application/use-cases/EmailVerify.ts"
 import type { LogoutUser } from "../../../application/use-cases/LogoutUser.ts";
 import type { CodeOTPVerify } from "../../../application/use-cases/CodeOTPVerify.ts";
 import type { GithubRequest } from "../../../application/use-cases/GithubRequest.ts";
+import type { GithubExchange } from "../../../application/use-cases/GithubExchange.ts";
+import { GithubUserInfo } from "../../../application/use-cases/GithubUserInfo.ts";
 
 export class AuthController {
     private loginUseCase: LoginUser;
@@ -16,6 +18,8 @@ export class AuthController {
     private logoutUseCase: LogoutUser;
     private codeOTPVerifyUseCase: CodeOTPVerify;
     private githubRequestUseCase: GithubRequest;
+    private githubExchange: GithubExchange;
+    private githubUserInfo: GithubUserInfo;
     private github_url = "https://github.com/login/oauth/authorize";
 
     constructor(
@@ -24,7 +28,9 @@ export class AuthController {
         emailVerifyUseCase: EmailVerify,
         logoutUseCase: LogoutUser,
         codeOTPVerifyUseCase: CodeOTPVerify,
-        githubRequest: GithubRequest
+        githubRequest: GithubRequest,
+        githubExchange: GithubExchange,
+        githubUserInfo: GithubUserInfo
     )
     {
         this.loginUseCase = loginUseCase;
@@ -32,7 +38,9 @@ export class AuthController {
         this.emailVerifyUseCase = emailVerifyUseCase;
         this.logoutUseCase = logoutUseCase;
         this.codeOTPVerifyUseCase = codeOTPVerifyUseCase;
-        this.githubRequestUseCase = githubRequest
+        this.githubRequestUseCase = githubRequest;
+        this.githubExchange = githubExchange;
+        this.githubUserInfo = githubUserInfo;
     }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
@@ -141,10 +149,21 @@ export class AuthController {
         }catch(error){
             next(error);
         }
+    };
 
-    }
-
-    githubCallback = (req: Request, res: Response) => {
+    githubCallback = async (req: Request, res: Response) => {
         const code = req.query.code as string;
-    }
+
+        const access_token = await this.githubExchange.execute(code);
+        if(!access_token) throw new AppError("ACCESS TOKEN NOT PROVIDED FROM GITHUB", 500);
+
+        const user_info = await this.githubUserInfo.execute(access_token);
+        if(!user_info) throw new AppError("USER DATA NOT PROVIDED FROM GITHUB", 500);
+
+        console.log(user_info);
+
+        return res.status(200).json({
+            message: "All good"
+        })
+    };
 }

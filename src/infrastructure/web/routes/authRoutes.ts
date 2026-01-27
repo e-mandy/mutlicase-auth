@@ -12,6 +12,8 @@ import { LogoutUser } from '../../../application/use-cases/LogoutUser.ts';
 import { CodeOTPVerify } from '../../../application/use-cases/CodeOTPVerify.ts';
 import { SpeakeasyOTPService } from '../../security/SpeakeasyOTPService.ts';
 import { GithubRequest } from '../../../application/use-cases/GithubRequest.ts';
+import { GithubExchange } from '../../../application/use-cases/GithubExchange.ts';
+import { GithubUserInfo } from '../../../application/use-cases/GithubUserInfo.ts';
 
 const router = express.Router();
 
@@ -25,13 +27,17 @@ const emailVerifyUseCase = new EmailVerify(userRepository, tokenService);
 const logoutUseCase = new LogoutUser(userRepository);
 const verifyOTPUseCase = new CodeOTPVerify(userRepository, speakeasyService, tokenService);
 const githubRequestUseCase = new GithubRequest();
+const githubExchange = new GithubExchange();
+const githubUserInfo = new GithubUserInfo();
 const auth = new AuthController(
     loginUseCase, 
     registerUseCase, 
     emailVerifyUseCase, 
     logoutUseCase, 
     verifyOTPUseCase,
-    githubRequestUseCase
+    githubRequestUseCase,
+    githubExchange,
+    githubUserInfo
 );
 
 
@@ -42,5 +48,7 @@ router.get('/me', authMiddleware(tokenService), (req: Request, res: Response) =>
 });
 router.get('/verify-email', auth.emailVerify);
 router.post('/verify-otp', auth.verifyOTP);
+router.get('/auth/github/request', auth.githubRequest);
+router.get('/auth/github/callback')
 
 export default router;
