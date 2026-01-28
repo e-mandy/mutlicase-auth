@@ -133,8 +133,14 @@ export class PrismaUserRepository implements IUserRepositories{
         });
     }
 
-    async linkOAuthAccount(userId: string, data: any){
-        //
+    async linkOAuthAccount(userId: string, data: { provider: string, providerId: string }){
+        await prisma.oAuthAccount.create({
+            data: {
+                provider: data.provider,
+                providerId: data.providerId,
+                userId: userId
+            }
+        });
     }
 
     async findUserByOAuth(provider: string, providerId: string){

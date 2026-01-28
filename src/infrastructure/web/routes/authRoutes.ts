@@ -44,6 +44,7 @@ const auth = new AuthController(
 );
 
 
+// SIMPLE AUTH
 router.post('/register', auth.register);
 router.post('/login', auth.login);
 router.get('/verify-email', auth.emailVerify);
@@ -51,7 +52,13 @@ router.post('/logout', auth.logout);
 router.get('/me', authMiddleware(tokenService), (req: Request, res: Response) => {
     res.status(200).json(req.user);
 });
+
+// TWO FACTOR AUTHENTICATION
+router.post('/setup', auth.setup2FA);
+router.post('/activate', auth.activate2FA);
 router.post('/verify-otp', auth.verifyOTP);
+
+// OAUTH ROUTES
 router.get('/request', auth.githubRequest);
 router.get('/callback', auth.githubCallback);
 
