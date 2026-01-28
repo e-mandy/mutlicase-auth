@@ -8,8 +8,9 @@ import type { EmailVerify } from "../../../application/use-cases/EmailVerify.ts"
 import type { LogoutUser } from "../../../application/use-cases/LogoutUser.ts";
 import type { CodeOTPVerify } from "../../../application/use-cases/CodeOTPVerify.ts";
 import type { GithubRequest } from "../../../application/use-cases/GithubRequest.ts";
-import type { GithubExchange } from "../../../application/use-cases/GithubExchange.ts";
+import { GithubExchange } from "../../../application/use-cases/GithubExchange.ts";
 import { GithubUserInfo } from "../../../application/use-cases/GithubUserInfo.ts";
+import type { SocialLogin } from "../../../application/use-cases/SocialLogin.ts";
 
 export class AuthController {
     private loginUseCase: LoginUser;
@@ -18,8 +19,9 @@ export class AuthController {
     private logoutUseCase: LogoutUser;
     private codeOTPVerifyUseCase: CodeOTPVerify;
     private githubRequestUseCase: GithubRequest;
-    private githubExchange: GithubExchange;
-    private githubUserInfo: GithubUserInfo;
+    private githubExchange: GithubExchange = new GithubExchange();
+    private githubUserInfo: GithubUserInfo = new GithubUserInfo();
+    private socialLogin: SocialLogin;
     private github_url = "https://github.com/login/oauth/authorize";
 
     constructor(
@@ -29,8 +31,7 @@ export class AuthController {
         logoutUseCase: LogoutUser,
         codeOTPVerifyUseCase: CodeOTPVerify,
         githubRequest: GithubRequest,
-        githubExchange: GithubExchange,
-        githubUserInfo: GithubUserInfo
+        socialLogin: SocialLogin
     )
     {
         this.loginUseCase = loginUseCase;
@@ -39,8 +40,7 @@ export class AuthController {
         this.logoutUseCase = logoutUseCase;
         this.codeOTPVerifyUseCase = codeOTPVerifyUseCase;
         this.githubRequestUseCase = githubRequest;
-        this.githubExchange = githubExchange;
-        this.githubUserInfo = githubUserInfo;
+        this.socialLogin = socialLogin;
     }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
@@ -151,19 +151,30 @@ export class AuthController {
         }
     };
 
-    githubCallback = async (req: Request, res: Response) => {
+    githubCallback = async (req: Request, res: Response, next: NextFunction) => {
         const code = req.query.code as string;
+        if(!code) throw new AppError("CODE NOT PROVIDE FROM GITHUB", 500);
 
-        const access_token = await this.githubExchange.execute(code);
-        if(!access_token) throw new AppError("ACCESS TOKEN NOT PROVIDED FROM GITHUB", 500);
+        try{
+            const access_token = await this.githubExchange.execute(code);
+            if(!access_token) throw new AppError("ACCESS TOKEN NOT PROVIDED FROM GITHUB", 500);
+    
+            const user_info = await this.githubUserInfo.execute(access_token);
+            if(!user_info) throw new AppError("USER DATA NOT PROVIDED FROM GITHUB", 500);
+    
+            const response = await this.socialLogin.execute("GITHUB", user_info.id, user_info.email, false);
 
-        const user_info = await this.githubUserInfo.execute(access_token);
-        if(!user_info) throw new AppError("USER DATA NOT PROVIDED FROM GITHUB", 500);
+            res.cookie('refreshToken', response.refresh_token, {
+                httpOnly: true,
+                sameSite: 'lax'
+            });
 
-        console.log(user_info);
-
-        return res.status(200).json({
-            message: "All good"
-        })
+            return res.status(200).json({
+                access_token: response.access_token,
+                
+            });
+        }catch(error: any){
+            next(error);
+        }
     };
 }

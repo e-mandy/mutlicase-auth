@@ -29,10 +29,12 @@ export class GithubExchange {
     
             const response = await axios.post(this.github_url_post, params.toString(), {
                 headers: {
-                    'Content-Type': "application/x-www-form-urlencoded"
+                    'Content-Type': "application/x-www-form-urlencoded",
+                    'Accept': "application/json"
                 }
             });
-    
+            
+            console.log(response.data);
             return response.data.access_token as string;
         }catch(error: any){
             throw new AppError(error.name, 500);

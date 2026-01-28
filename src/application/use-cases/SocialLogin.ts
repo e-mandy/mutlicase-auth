@@ -13,7 +13,7 @@ export class SocialLogin{
 
     async execute(provider: string, providerId: string, email: string, emailVerified: boolean){
         if(!emailVerified) throw new AppError('PROVIDER EMAIL NOT VERIFIED', 403);
-        
+
         let userId: string;
         const oAuthUser = await this.userRepository.findUserByOAuth(provider, providerId);
         if(oAuthUser){
@@ -31,7 +31,6 @@ export class SocialLogin{
             await this.userRepository.activateUser(userId);
         }
 
-        
         const access_token = this.tokenService.generateAccessToken({ userId: userId });
         const refresh_token = this.tokenService.generateRefreshToken({ userId: userId });
     
