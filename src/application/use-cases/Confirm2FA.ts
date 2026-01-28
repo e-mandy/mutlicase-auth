@@ -1,6 +1,5 @@
 import { AppError } from "../../domain/exceptions/AppError.ts";
 import type { IUserRepositories } from "../../domain/repositories/UserRepositories.ts";
-import speakeasy from 'speakeasy';
 import type { IOTPService } from "../../domain/security/IOTPService.ts";
 
 export class Confirm2FA{

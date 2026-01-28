@@ -13,6 +13,8 @@ import { CodeOTPVerify } from '../../../application/use-cases/CodeOTPVerify.ts';
 import { SpeakeasyOTPService } from '../../security/SpeakeasyOTPService.ts';
 import { GithubRequest } from '../../../application/use-cases/GithubRequest.ts';
 import { SocialLogin } from '../../../application/use-cases/SocialLogin.ts';
+import { Setup2FA } from '../../../application/use-cases/Setup2FA.ts';
+import { Confirm2FA } from '../../../application/use-cases/Confirm2FA.ts';
 
 const router = express.Router();
 
@@ -27,6 +29,8 @@ const logoutUseCase = new LogoutUser(userRepository);
 const verifyOTPUseCase = new CodeOTPVerify(userRepository, speakeasyService, tokenService);
 const githubRequestUseCase = new GithubRequest();
 const socialLogin = new SocialLogin(userRepository, tokenService);
+const setupTwoFactor = new Setup2FA(userRepository, speakeasyService);
+const confirm2FA = new Confirm2FA(userRepository, speakeasyService);
 const auth = new AuthController(
     loginUseCase, 
     registerUseCase, 
@@ -34,16 +38,19 @@ const auth = new AuthController(
     logoutUseCase, 
     verifyOTPUseCase,
     githubRequestUseCase,
-    socialLogin
+    socialLogin,
+    setupTwoFactor,
+    confirm2FA
 );
 
 
 router.post('/register', auth.register);
 router.post('/login', auth.login);
+router.get('/verify-email', auth.emailVerify);
+router.post('/logout', auth.logout);
 router.get('/me', authMiddleware(tokenService), (req: Request, res: Response) => {
     res.status(200).json(req.user);
 });
-router.get('/verify-email', auth.emailVerify);
 router.post('/verify-otp', auth.verifyOTP);
 router.get('/request', auth.githubRequest);
 router.get('/callback', auth.githubCallback);

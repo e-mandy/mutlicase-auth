@@ -11,6 +11,8 @@ import type { GithubRequest } from "../../../application/use-cases/GithubRequest
 import { GithubExchange } from "../../../application/use-cases/GithubExchange.ts";
 import { GithubUserInfo } from "../../../application/use-cases/GithubUserInfo.ts";
 import type { SocialLogin } from "../../../application/use-cases/SocialLogin.ts";
+import type { Setup2FA } from "../../../application/use-cases/Setup2FA.ts";
+import type { Confirm2FA } from "../../../application/use-cases/Confirm2FA.ts";
 
 export class AuthController {
     private loginUseCase: LoginUser;
@@ -19,9 +21,11 @@ export class AuthController {
     private logoutUseCase: LogoutUser;
     private codeOTPVerifyUseCase: CodeOTPVerify;
     private githubRequestUseCase: GithubRequest;
+    private socialLogin: SocialLogin;
+    private setupTwoFactor: Setup2FA;
+    private confirm2FA: Confirm2FA;
     private githubExchange: GithubExchange = new GithubExchange();
     private githubUserInfo: GithubUserInfo = new GithubUserInfo();
-    private socialLogin: SocialLogin;
     private github_url = "https://github.com/login/oauth/authorize";
 
     constructor(
@@ -31,7 +35,9 @@ export class AuthController {
         logoutUseCase: LogoutUser,
         codeOTPVerifyUseCase: CodeOTPVerify,
         githubRequest: GithubRequest,
-        socialLogin: SocialLogin
+        socialLogin: SocialLogin,
+        setupTwoFactor: Setup2FA,
+        confirm2FA: Confirm2FA
     )
     {
         this.loginUseCase = loginUseCase;
@@ -41,6 +47,8 @@ export class AuthController {
         this.codeOTPVerifyUseCase = codeOTPVerifyUseCase;
         this.githubRequestUseCase = githubRequest;
         this.socialLogin = socialLogin;
+        this.setupTwoFactor = setupTwoFactor
+        this.confirm2FA = confirm2FA
     }
 
     register = async (req: Request, res: Response, next: NextFunction) => {
@@ -124,9 +132,45 @@ export class AuthController {
         }
     }
 
+    setup2FA = async (req: Request, res: Response, next: NextFunction) => {
+        const { email } = req.body;
+
+        try{
+            const qrcode = await this.setupTwoFactor.execute(email);
+            return res.status(200).json({
+                code: 200,
+                qrcode
+            });
+        }catch(error){
+            next(error);
+        }
+
+    }
+
+    activate2FA = async (req: Request, res: Response, next: NextFunction) => {
+        const userId = req.user?.userId as string;
+        const { token } = req.body;
+
+        if(!token) throw new AppError('CODE NOT PROVIDED', 400);
+
+        try{
+            const result = await this.confirm2FA.execute(userId, token);
+            if(!result) throw new AppError('TWO FACTOR AUTHENTICATION ACTIVATION FAILED', 500);
+
+            return res.status(200).json({
+                code: 200,
+                message: "2FA activated successfully"
+            })
+        }catch(error){
+            next(error);
+        }
+    }
+
     verifyOTP = async (req: Request, res: Response, next: NextFunction) => {
         const { token } = req.body;
         const userId = req.user?.userId as string;
+
+        if(!token) throw new AppError('CODE NOT PROVIDED', 400);
 
         try{
             const result = await this.codeOTPVerifyUseCase.execute(token, userId);
