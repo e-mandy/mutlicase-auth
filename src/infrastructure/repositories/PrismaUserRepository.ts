@@ -189,6 +189,19 @@ export class PrismaUserRepository implements IUserRepositories{
         });
     }
 
+    async desactivateUser2FA(userId: string){
+        await prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                twoFactorSecret: null,
+                twoFactorEnabledAt: null,
+                disabledAt: new Date()
+            }
+        });
+    }
+
     async findSecretByUserId(userId: string){
         const result = await prisma.user.findUnique({
             where: {

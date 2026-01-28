@@ -6,7 +6,7 @@ import type { ITokenService } from "../../domain/security/ITokenService.ts";
 export class CodeOTPVerify{
     private userRepository: IUserRepositories;
     private otpService: IOTPService;
-        tokenService: ITokenService;
+    private tokenService: ITokenService;
 
     constructor(repository: IUserRepositories, otpServices: IOTPService, tokenService: ITokenService){
         this.userRepository = repository;
